@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guardiões das Tartarugas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        /* --- Configurações Gerais e Fontes --- */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        :root {
+            --primary-color: #2c7a7b;
+            --secondary-color: #38b2ac;
+            --light-bg: #f0f7f7;
+            --white-bg: #ffffff;
+            --table-header-bg: #f7fafc;
+            --font-dark: #333;
+            --font-light: #ffffff;
+            --risk-color: #e5a041;
+            --danger-color: #e57373;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            background-color: var(--light-bg);
+            color: var(--font-dark);
+            line-height: 1.6;
+        }
+
+        /* --- Cabeçalho --- */
+        header {
+            background-color: var(--primary-color);
+            color: var(--font-light);
+            padding: 25px 40px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            font-weight: 700;
+        }
+
+        header .fa-shield-alt {
+            margin-right: 12px;
+        }
+
+        header p {
+            margin: 5px 0 0 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        /* --- Corpo Principal --- */
+        main {
+            padding: 25px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* --- Seção de Botões de Ação --- */
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .action-button {
+            background-color: var(--secondary-color);
+            color: var(--font-light);
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .action-button.risk { background-color: var(--risk-color); }
+        .action-button.danger { background-color: var(--danger-color); }
+
+        /* --- Container da Tabela --- */
+        .table-container {
+            background-color: var(--white-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            overflow-x: auto;
+        }
+
+        .table-container h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.7em;
+            color: var(--primary-color);
+        }
+
+        /* --- Tabela --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        thead {
+            background-color: var(--table-header-bg);
+        }
+
+        th {
+            font-size: 1em;
+            font-weight: 600;
+            color: #4a5568;
+            text-transform: uppercase;
+        }
+
+        tbody tr:nth-child(even) { background-color: var(--table-header-bg); }
+        tbody tr:hover { background-color: #edf2f7; }
+        td { font-size: 0.95em; }
+        
+        /* --- Indicador de Risco (Bolinha Colorida) --- */
+        .risk-dot {
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .risk-green { background-color: #48bb78; }
+        .risk-yellow { background-color: #f6e05e; }
+        .risk-red { background-color: #e53e3e; }
+
+        /* --- Modal para Adicionar Ninho --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 8% auto;
+            padding: 35px;
+            border: none;
+            width: 90%;
+            max-width: 550px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            position: relative;
+            animation: slideIn 0.4s;
+        }
+        
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+        @keyframes slideIn { from {transform: translateY(-50px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
+
+        .close-button {
+            color: #aaa;
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .close-button:hover, .close-button:focus { color: black; }
+        
+        #addNestForm { display: flex; flex-direction: column; gap: 18px; }
+        #addNestForm h2 { margin-top: 0; color: var(--primary-color); }
+        #addNestForm label { font-weight: 600; color: #2d3748; }
+        #addNestForm input, #addNestForm select {
+            padding: 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Poppins', sans-serif;
+        }
+        #addNestForm button {
+            background-color: var(--primary-color);
+            color: var(--font-light);
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        #addNestForm button:hover { background-color: #286a6b; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1><i class="fa-solid fa-shield-alt"></i>Guardiões das Tartarugas</h1>
+        <p>Monitoramento de ninhos em tempo real</p>
+    </header>
+
+    <main>
+        <div class="actions">
+            <button class="action-button" id="btn-ver-ninhos"><i class="fa-solid fa-list-ul"></i> Ver Todos Ninhos</button>
+            <button class="action-button" id="btn-adicionar-ninho"><i class="fa-solid fa-plus"></i> Adicionar Ninho</button>
+            <button class="action-button" id="btn-media-ovos"><i class="fa-solid fa-chart-pie"></i> Média de ovos (🟢)</button>
+            <button class="action-button" id="btn-prestes-eclodir"><i class="fa-solid fa-hourglass-half"></i> Prestes a eclodir</button>
+            <button class="action-button risk" id="btn-regiao-risco"><i class="fa-solid fa-map-marker-alt"></i> Região com mais risco (🔴)</button>
+            <button class="action-button danger" id="btn-danificados-predadores"><i class="fa-solid fa-triangle-exclamation"></i> Danificados com predadores</button>
+        </div>
+
+        <div class="table-container">
+            <h2>Registros de Ninhos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Região</th>
+                        <th>Ovos</th>
+                        <th>Status</th>
+                        <th>Risco</th>
+                        <th>Dias</th>
+                        <th>Predadores</th>
+                    </tr>
+                </thead>
+                <tbody id="nest-table-body">
+                    </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="addNestModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModalBtn">&times;</span>
+            <form id="addNestForm">
+                <h2>Adicionar Novo Registro</h2>
+                <label for="regiao">Região da Praia:</label>
+                <input type="text" id="regiao" name="regiao" required placeholder="Ex: Praia da Esperança">
+    
+                <label for="ovos">Quantidade de Ovos:</label>
+                <input type="number" id="ovos" name="ovos" required min="1" placeholder="Ex: 85">
+    
+                <label for="status">Situação do Ninho:</label>
+                <select id="status" name="status" required>
+                    <option value="Intacto">Intacto</option>
+                    <option value="Ameaçado">Ameaçado</option>
+                    <option value="Danificado">Danificado</option>
+                </select>
+    
+                <label for="risco">Risco do Ninho:</label>
+                <select id="risco" name="risco" required>
+                    <option value="🟢">🟢 Estável</option>
+                    <option value="🟡">🟡 Sob observação</option>
+                    <option value="🔴">🔴 Crítico</option>
+                </select>
+    
+                <label for="dias">Dias para Eclosão:</label>
+                <input type="number" id="dias" name="dias" required min="1" placeholder="Ex: 45">
+    
+                <label for="predadores">Há predadores?</label>
+                <select id="predadores" name="predadores" required>
+                    <option value="false">Não</option>
+                    <option value="true">Sim</option>
+                </select>
+    
+                <button type="submit">Registrar Ninho</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Aguarda o carregamento completo do DOM antes de executar o script
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- BASE DE DADOS INICIAL ---
+            const ninhos_de_tartarugas = [
+                {Região: "Praia norte", Ovos: 2, Status: "Ameaçado", Risco: "🟡", Dias: 30, Predadores: false},
+                {Região: "Praia oeste", Ovos: 53, Status: "Danificado", Risco: "🔴", Dias: 5, Predadores: true},
+                {Região: "Praia sul", Ovos: 40, Status: "Danificado", Risco: "🔴", Dias: 3, Predadores: false},
+                {Região: "Praia leste", Ovos: 112, Status: "Intacto", Risco: "🟢", Dias: 55, Predadores: false},
+                {Região: "Praia tartaruga", Ovos: 89, Status: "Intacto", Risco: "🟢", Dias: 48, Predadores: false},
+                {Região: "Baía dos corais", Ovos: 75, Status: "Ameaçado", Risco: "🟡", Dias: 25, Predadores: true},
+                {Região: "Praia noroeste", Ovos: 33, Status: "Danificado", Risco: "🔴", Dias: 12, Predadores: true},
+                {Região: "Baía esperança", Ovos: 121, Status: "Intacto", Risco: "🟢", Dias: 58, Predadores: false},
+                {Região: "Praia sudoeste", Ovos: 62, Status: "Ameaçado", Risco: "🟡", Dias: 35, Predadores: false},
+                {Região: "Costão rochoso", Ovos: 45, Status: "Ameaçado", Risco: "🟡", Dias: 18, Predadores: true},
+                {Região: "Ponta da praia", Ovos: 15, Status: "Danificado", Risco: "🔴", Dias: 7, Predadores: true},
+                {Região: "Praia da desova", Ovos: 95, Status: "Intacto", Risco: "🟢", Dias: 42, Predadores: false},
+                {Região: "Lagoa azul", Ovos: 81, Status: "Ameaçado", Risco: "🟡", Dias: 22, Predadores: false},
+                {Região: "Praia sudeste", Ovos: 105, Status: "Intacto", Risco: "🟢", Dias: 50, Predadores: true}
+            ];
+
+            // --- REFERÊNCIAS AOS ELEMENTOS DO DOM ---
+            const tableBody = document.getElementById('nest-table-body');
+            const modal = document.getElementById('addNestModal');
+            const addNestForm = document.getElementById('addNestForm');
+
+            // --- FUNÇÃO PARA RENDERIZAR A TABELA ---
+            function renderTable() {
+                if (!tableBody) return; // Verificação de segurança
+                tableBody.innerHTML = ''; // Limpa a tabela antes de renderizar
+
+                ninhos_de_tartarugas.forEach(ninho => {
+                    const row = tableBody.insertRow(); // Cria uma nova linha na tabela
+
+                    let riskClass = '';
+                    if (ninho.Risco === '🟢') riskClass = 'risk-green';
+                    else if (ninho.Risco === '🟡') riskClass = 'risk-yellow';
+                    else if (ninho.Risco === '🔴') riskClass = 'risk-red';
+
+                    row.innerHTML = `
+                        <td>${ninho.Região}</td>
+                        <td>${ninho.Ovos}</td>
+                        <td>${ninho.Status}</td>
+                        <td><span class="risk-dot ${riskClass}"></span></td>
+                        <td>${ninho.Dias}</td>
+                        <td>${ninho.Predadores ? 'Sim' : 'Não'}</td>
+                    `;
+                });
+            }
+
+// --- FUNÇÕES DE ANÁLISE DE DADOS ---
+            const analysisFunctions = {
+                mediaOvos: () => {
+                    const ninhosVerdes = ninhos_de_tartarugas.filter(n => n.Risco === '🟢');
+                    if (ninhosVerdes.length === 0) return alert("Não há ninhos com risco '🟢' para calcular a média.");
+                    const totalOvos = ninhosVerdes.reduce((acc, n) => acc + n.Ovos, 0);
+                    const media = totalOvos / ninhosVerdes.length;
+                    alert(`A média de ovos para ninhos com risco "🟢" é de: ${media.toFixed(2)}`);
+                },
+                prestesEclodir: () => {
+                    const prestes = ninhos_de_tartarugas.filter(n => n.Dias <= 5);
+                    alert(`A quantidade de ninhos prestes a eclodir (5 dias ou menos) é: ${prestes.length}`);
+                },
+                regiaoRisco: () => {
+                    const contagem = ninhos_de_tartarugas.reduce((acc, n) => {
+                        if (n.Risco === '🔴') acc[n.Região] = (acc[n.Região] || 0) + 1;
+                        return acc;
+                    }, {});
+
+                    // Encontra a região com o maior número de riscos
+                    const [regiaoMaisRisco, maxRiscos] = Object.entries(contagem).reduce((max, current) => current[1] > max[1] ? current : max, ['', 0]);
+                    
+                    if (maxRiscos > 0) {
+                        alert(`A região com mais ninhos de risco "🔴" é: ${regiaoMaisRisco} (com ${maxRiscos} ninhos).`);
+                    } else {
+                        alert(`Não há ninhos com risco "🔴" registrados.`);
+                    }
+                },
+                danificadosPredadores: () => {
+                    const criticos = ninhos_de_tartarugas.filter(n => n.Predadores && n.Status === 'Danificado');
+                    alert(`A quantidade de ninhos danificados com presença de predadores é: ${criticos.length}`);
+                }
+            };
+
+            // --- LÓGICA DO MODAL (ABRIR/FECHAR) ---
+            function setupModal() {
+                if (!modal) return;
+                const openBtn = document.getElementById('btn-adicionar-ninho');
+                const closeBtn = document.getElementById('closeModalBtn');
+                
+                openBtn.addEventListener('click', () => modal.style.display = 'block');
+                closeBtn.addEventListener('click', () => modal.style.display = 'none');
+                window.addEventListener('click', (event) => {
+                    if (event.target === modal) modal.style.display = 'none';
+                });
+            }
+
+            // --- LÓGICA DO FORMULÁRIO ---
+            if (addNestForm) {
+                addNestForm.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    
+                    const regiaoInput = document.getElementById('regiao').value.trim();
+                    if (!regiaoInput) return alert('O campo Região é obrigatório.');
+                    
+                    const novoNinho = {
+                        Região: regiaoInput.charAt(0).toUpperCase() + regiaoInput.slice(1).toLowerCase(),
+                        Ovos: parseInt(document.getElementById('ovos').value),
+                        Status: document.getElementById('status').value,
+                        Risco: document.getElementById('risco').value,
+                        Dias: parseInt(document.getElementById('dias').value),
+                        Predadores: document.getElementById('predadores').value === 'true'
+                    };
+                    
+                    ninhos_de_tartarugas.push(novoNinho);
+                    alert('Ninho registrado com sucesso! ✅');
+                    
+                    modal.style.display = 'none';
+                    addNestForm.reset();
+                    renderTable();
+                });
+            }
+
+            // --- ADICIONA EVENTOS AOS BOTÕES ---
+            function setupEventListeners() {
+                document.getElementById('btn-ver-ninhos')?.addEventListener('click', renderTable);
+                document.getElementById('btn-media-ovos')?.addEventListener('click', analysisFunctions.mediaOvos);
+                document.getElementById('btn-prestes-eclodir')?.addEventListener('click', analysisFunctions.prestesEclodir);
+                document.getElementById('btn-regiao-risco')?.addEventListener('click', analysisFunctions.regiaoRisco);
+                document.getElementById('btn-danificados-predadores')?.addEventListener('click', analysisFunctions.danificadosPredadores);
+            }
+
+            // --- INICIALIZAÇÃO ---
+            renderTable();
+            setupModal();
+            setupEventListeners();
+        });
+    </script>
+</body>
+</html>
